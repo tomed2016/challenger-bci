@@ -21,6 +21,8 @@ import com.crud.challenger.exception.UserNotFoundException;
 import com.crud.challenger.persistence.entities.User;
 import com.crud.challenger.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @RestController
 @RequestMapping("/user")
+@Tag(name = "User Controller", description = "Endpoints para la getsión de usuarios")
 @Slf4j
 public class UserController {
 	
@@ -38,18 +41,21 @@ public class UserController {
 	}
 	
 	@PostMapping(produces = "application/json")
+	@Operation(summary = "createUser", description = "Crea un nuevo usuario en el sistema")
 	public ResponseEntity<User> createUser(@Valid @RequestBody SaveUser saveUser) {
 		User createdUser = userService.createUser(saveUser);
 		return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
 	}	
 	
 	@PutMapping(produces = "application/json")
+	@Operation(summary = "updateUser", description = "Actualiza un usuario existente en el sistema")
 	public ResponseEntity<User> updateUser(@Valid @RequestBody SaveUser saveUser) {
 		User updatedUser = userService.updateUser(saveUser);
 		return new ResponseEntity<>(updatedUser, HttpStatus.OK);
 	}
 	
 	@PutMapping(value ="/user_uuid/disabled", produces = "application/json")
+	@Operation(summary = "disabledUser", description = "Desactiva un usuario existente en el sistema")
 	public ResponseEntity<UserError> disabledUser(@PathVariable("user_uuid") UUID userUuid) {
 		User disableUser = null;
 		UserError userError = new UserError();
