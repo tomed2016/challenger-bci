@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.crud.challenger.persistence.entities.User;
@@ -12,4 +13,7 @@ import com.crud.challenger.persistence.entities.User;
 public interface UserRepository extends JpaRepository<User, UUID> {
 	
 	Optional<User> findByUserName(String name);
+	
+	@Query(name = "User.findByEmail")
+	Optional<User>findByEmail(String email);
 }

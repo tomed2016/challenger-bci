@@ -20,6 +20,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -32,6 +33,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "users")
+@NamedQuery(name = "User.findByEmail", query = "SELECT u FROM User u WHERE u.email = :email")
 public class User implements UserDetails {
 	  
 	private static final long serialVersionUID = 1L;
@@ -55,6 +57,9 @@ public class User implements UserDetails {
 	
 	@OneToMany(mappedBy = "user", cascade= CascadeType.ALL, fetch = FetchType.LAZY)
 	private Phone[] phones;
+	
+	@Column(name = "jwt_token", length = 500)
+	private String jwtToken;
 
 	
 	@Temporal(TemporalType.TIMESTAMP)

@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import com.crud.challenger.dto.RegisteredUser;
 import com.crud.challenger.dto.UserDTO;
+import com.crud.challenger.exception.EmailAlreadyExistException;
 import com.crud.challenger.exception.UserNotFoundException;
 import com.crud.challenger.persistence.entities.User;
 
@@ -22,10 +23,10 @@ import jakarta.validation.Valid;
 public interface UserService {
 
 
-	RegisteredUser updateUser(@Valid UserDTO saveUser, UUID userUuid) throws UserNotFoundException;
+	RegisteredUser updateUser(@Valid UserDTO saveUser, UUID userUuid) throws UserNotFoundException, EmailAlreadyExistException;
 
 	User disableUser(UUID userUuid) throws UserNotFoundException;
 
-	RegisteredUser registerUser(@Valid UserDTO saveUser);
+	RegisteredUser registerUser(@Valid UserDTO saveUser) throws EmailAlreadyExistException;
 
 }

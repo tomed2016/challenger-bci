@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.crud.challenger.dto.RegisteredUser;
 import com.crud.challenger.dto.UserDTO;
 import com.crud.challenger.dto.UserError;
+import com.crud.challenger.exception.EmailAlreadyExistException;
 import com.crud.challenger.exception.UserNotFoundException;
 import com.crud.challenger.persistence.entities.User;
 import com.crud.challenger.service.UserService;
@@ -44,18 +45,24 @@ public class UserController {
 	
 	@PostMapping(produces = "application/json")
 	@Operation(summary = "createUser", description = "Crea un nuevo usuario en el sistema")
-	public ResponseEntity<RegisteredUser> createUser(@Valid @RequestBody UserDTO saveUser) {
-		//User createdUser = userService.createUser(saveUser);
-		RegisteredUser registeredUser = userService.registerUser(saveUser);
+	public ResponseEntity<Object> createUser(@Valid @RequestBody UserDTO saveUser) {
+		RegisteredUser registeredUser;
+		UserError userError = new UserError();
+		try {
+			registeredUser = userService.registerUser(saveUser);
+		} catch (EmailAlreadyExistException e) {
+			log.error("Email inválido: {}", e.getMessage());
+			userError.setMessage(String.valueOf(HttpStatus.BAD_REQUEST.value()));
+			userError.setDescription("Email ya existe");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(userError);			}
 		return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
 	}	
 	
-	@PutMapping(produces = "application/json")
+	@PutMapping(value= "/{userUuid}", produces = "application/json")
 	@Operation(summary = "updateUser", description = "Actualiza un usuario existente en el sistema")
 	public ResponseEntity<Object> updateUser(@Valid @RequestBody UserDTO saveUser, 
-													 @PathVariable("user_uuid") UUID userUuid) {
+													@PathVariable UUID userUuid) {
 		
-		log.info("====>Updating user: {}", userUuid);
 		RegisteredUser updatedUser;
 		UserError userError = new UserError();
 		try {
@@ -65,13 +72,18 @@ public class UserController {
 			userError.setMessage(String.valueOf(HttpStatus.NOT_FOUND.value()));
 			userError.setDescription("User not found");
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(userError);	
+		} catch (EmailAlreadyExistException e) {
+			log.error("Email inválido: {}", e.getMessage());
+			userError.setMessage(String.valueOf(HttpStatus.BAD_REQUEST.value()));
+			userError.setDescription("User not found");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(userError);	
 		}
 		return new ResponseEntity<Object>(updatedUser, HttpStatus.OK);
 	}
 	
-	@PutMapping(value ="/user_uuid/disabled", produces = "application/json")
-	@Operation(summary = "disabledUser", description = "Desactiva un usuario existente en el sistema")
-	public ResponseEntity<UserError> disabledUser(@PathVariable("user_uuid") UUID userUuid) {
+	@PutMapping(value ="/{userUuid}/disabled", produces = "application/json")
+	@Operation(summary = "disabled", description = "Desactiva un usuario existente en el sistema")
+	public ResponseEntity<UserError> disabledUser(@PathVariable UUID userUuid) {
 		User disableUser = null;
 		UserError userError = new UserError();
 		try {
@@ -87,8 +99,7 @@ public class UserController {
 		return ResponseEntity.ok(userError);
 	}
 	
-	
-	
+
 	
 
 }

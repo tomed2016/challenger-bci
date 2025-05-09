@@ -8,6 +8,7 @@ create table users (
 	created_at timestamp(6), 
 	last_login timestamp(6), 
 	updated_at timestamp(6), 
+	jwt_token varchar(500) NOT NULL,
 	primary key (user_uuid));
 
 create table phones (
