@@ -1,6 +1,6 @@
 package com.crud.challenger.dto;
 
-import java.util.List;
+import com.crud.challenger.persistence.entities.Phone;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -13,8 +13,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "name")
-public class SaveUser implements java.io.Serializable {
+public class UserDTO implements java.io.Serializable {
 	private static final long serialVersionUID = 1L;
+	
 	
 	@NotNull(message = "El nombre no puede ser nulo")
 	@NotBlank(message = "El nombre no puede estar vacío")
@@ -41,9 +42,7 @@ public class SaveUser implements java.io.Serializable {
 	@Size(min = 8, max = 12, message = "El password debe tener entre 8 y 12 caracteres")
 	private String passwordConfirm;
 
-	@NotNull(message = "El rol no puede ser nulo. Al menos debe enviar uno")
-	@NotBlank(message = "El rol no puede estar vacío. Al menos debe enviar uno")
-	private List<SavePhone> phones;
+	private Phone[] phones;
 	
 	private String jwtToken;
 

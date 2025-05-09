@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(of = {"cityCode", "countryCode", "number"})
-public class SavePhone implements Serializable {
+public class PhoneDTO implements Serializable {
 
 	/**
 	 * 

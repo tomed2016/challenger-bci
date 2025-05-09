@@ -15,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 
@@ -22,6 +23,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "phones")
+@EqualsAndHashCode(of = {"cityCode", "countryCode", "number"})	
 public class Phone {
 	@Id
 	@GeneratedValue(strategy=GenerationType.UUID)
@@ -35,14 +37,11 @@ public class Phone {
 	private String cityCode;
 	
 	@Column(name = "country_code", nullable = false, length = 3)
-	private String contryCode;
+	private String countryCode;
 	
-	@ManyToOne
-    @JoinColumn(name="user_uuid", nullable=false)
+	@ManyToOne(optional = false)
+    @JoinColumn(name="user_uuid", nullable=false, referencedColumnName="user_uuid")
 	private User user;
-	
-
-	
 
 
 }

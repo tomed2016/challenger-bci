@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.crud.challenger.dto.SaveUser;
+import com.crud.challenger.dto.RegisteredUser;
+import com.crud.challenger.dto.UserDTO;
 import com.crud.challenger.dto.UserError;
 import com.crud.challenger.exception.UserNotFoundException;
 import com.crud.challenger.persistence.entities.User;
@@ -36,22 +37,36 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
 	
 	private UserService userService;
+	
 	public UserController(UserService userService) {
 		this.userService = userService;
 	}
 	
 	@PostMapping(produces = "application/json")
 	@Operation(summary = "createUser", description = "Crea un nuevo usuario en el sistema")
-	public ResponseEntity<User> createUser(@Valid @RequestBody SaveUser saveUser) {
-		User createdUser = userService.createUser(saveUser);
-		return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+	public ResponseEntity<RegisteredUser> createUser(@Valid @RequestBody UserDTO saveUser) {
+		//User createdUser = userService.createUser(saveUser);
+		RegisteredUser registeredUser = userService.registerUser(saveUser);
+		return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
 	}	
 	
 	@PutMapping(produces = "application/json")
 	@Operation(summary = "updateUser", description = "Actualiza un usuario existente en el sistema")
-	public ResponseEntity<User> updateUser(@Valid @RequestBody SaveUser saveUser) {
-		User updatedUser = userService.updateUser(saveUser);
-		return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+	public ResponseEntity<Object> updateUser(@Valid @RequestBody UserDTO saveUser, 
+													 @PathVariable("user_uuid") UUID userUuid) {
+		
+		log.info("====>Updating user: {}", userUuid);
+		RegisteredUser updatedUser;
+		UserError userError = new UserError();
+		try {
+			updatedUser = userService.updateUser(saveUser, userUuid);
+		} catch (UserNotFoundException e) {
+			log.error("Error disabling user: {}", e.getMessage());
+			userError.setMessage(String.valueOf(HttpStatus.NOT_FOUND.value()));
+			userError.setDescription("User not found");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(userError);	
+		}
+		return new ResponseEntity<Object>(updatedUser, HttpStatus.OK);
 	}
 	
 	@PutMapping(value ="/user_uuid/disabled", produces = "application/json")

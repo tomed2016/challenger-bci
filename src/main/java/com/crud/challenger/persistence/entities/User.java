@@ -6,16 +6,17 @@ package com.crud.challenger.persistence.entities;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,7 +24,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -47,15 +47,14 @@ public class User implements UserDetails {
 	@Column(name = "username", unique=true, nullable = false, length = 12)
 	private String userName;
 
-	@NotNull
 	@Column(name = "email", unique = true, nullable = false, length=100)
 	private String email;
 	
 	@Column(name = "password", nullable = false, length = 60)
 	private String password;
 	
-	@OneToMany(mappedBy = "user")
-	private List<Phone> phones;
+	@OneToMany(mappedBy = "user", cascade= CascadeType.ALL, fetch = FetchType.LAZY)
+	private Phone[] phones;
 
 	
 	@Temporal(TemporalType.TIMESTAMP)
@@ -75,6 +74,10 @@ public class User implements UserDetails {
 	public static enum UserStatus {
 		ACTIVE,
 		INACTIVE
+	}
+	
+	public Boolean isActive() {
+		return this.active == UserStatus.ACTIVE;
 	}
 
 	@Override
