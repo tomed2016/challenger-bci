@@ -3,11 +3,15 @@
  */
 package com.crud.challenger.persistence.entities;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import jakarta.persistence.CascadeType;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,7 +19,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -29,26 +32,31 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 	  
+	private static final long serialVersionUID = 1L;
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.UUID)
-	@Column(name = "uuid", updatable = false, nullable = false)
-	private UUID uuid;
+	@Column(name = "user_uuid", updatable = false, nullable = false)
+	private UUID userUuid;
 	
 	@Column(name = "name", nullable = false, length = 50)
 	private String name;
-	
+
+	@Column(name = "username", unique=true, nullable = false, length = 12)
+	private String userName;
+
 	@NotNull
 	@Column(name = "email", unique = true, nullable = false, length=100)
 	private String email;
 	
-	@Column(name = "password", nullable = false, length = 12)
+	@Column(name = "password", nullable = false, length = 60)
 	private String password;
 	
-	@JoinColumn(name = "phones_uuid", nullable = false)
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "user")
 	private List<Phone> phones;
+
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "created_at")
@@ -67,6 +75,16 @@ public class User {
 	public static enum UserStatus {
 		ACTIVE,
 		INACTIVE
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return new ArrayList<GrantedAuthority>();
+	}
+
+	@Override
+	public String getUsername() {
+		return this.getName();
 	}
 
 }

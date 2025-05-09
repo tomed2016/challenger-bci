@@ -11,6 +11,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -23,8 +25,8 @@ import lombok.Data;
 public class Phone {
 	@Id
 	@GeneratedValue(strategy=GenerationType.UUID)
-	@Column(name = "uuid", updatable = false, nullable = false)
-	private UUID uuid;
+	@Column(name = "phone_uuid", updatable = false, nullable = false)
+	private UUID phoneUuid;
 	
 	@Column(name = "phone_number", nullable = false, length = 20)
 	private String number;
@@ -32,7 +34,15 @@ public class Phone {
 	@Column(name = "city_code", nullable = false, length = 3)
 	private String cityCode;
 	
-	@Column(name = "contry_code", nullable = false, length = 3)
+	@Column(name = "country_code", nullable = false, length = 3)
 	private String contryCode;
+	
+	@ManyToOne
+    @JoinColumn(name="user_uuid", nullable=false)
+	private User user;
+	
+
+	
+
 
 }

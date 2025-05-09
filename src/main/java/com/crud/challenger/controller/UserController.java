@@ -62,7 +62,7 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(userError);	
 		}
 		userError.setMessage(String.valueOf(HttpStatus.OK.value()));
-		userError.setDescription("User disabled successfully " + disableUser.getUuid());
+		userError.setDescription("User disabled successfully " + disableUser.getUserUuid());
 		return ResponseEntity.ok(userError);
 	}
 	

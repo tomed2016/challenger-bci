@@ -14,7 +14,9 @@ import com.crud.challenger.persistence.entities.User;
 import jakarta.validation.Valid;
 
 /**
- * 
+ * @author Tomás González
+ * @date 2025-05-08
+ * @apiNote Intefaz con los métodos necesarios para la gestión de usuarios.
  */
 public interface UserService {
 
