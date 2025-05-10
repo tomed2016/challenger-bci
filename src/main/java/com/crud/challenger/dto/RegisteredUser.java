@@ -22,6 +22,7 @@ public class RegisteredUser implements Serializable {
 	private String name;
 	private String userName;
 	private String jwtToken;
+	private String email;
 	private Date createdAt;
 	private Date updatedAt;
 	private Date lastLogin;

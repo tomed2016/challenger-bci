@@ -1,0 +1,29 @@
+@startuml
+actor Client
+
+Client -> UserController: POST /user
+activate UserController
+UserController -> UserServiceImpl: registerUser(saveUser)
+activate UserServiceImpl
+UserServiceImpl -> UserRepository: save(user)
+activate UserRepository
+UserRepository --> UserServiceImpl: User
+deactivate UserRepository
+UserServiceImpl -> JwtService: generateToken(userName, extraClaims)
+activate JwtService
+JwtService --> UserServiceImpl: token
+deactivate JwtService
+UserServiceImpl --> UserController: RegisteredUser
+deactivate UserServiceImpl
+UserController --> Client: ResponseEntity<RegisteredUser>
+deactivate UserController
+
+Client -> HttpSecurityConfig: Configure Security
+activate HttpSecurityConfig
+HttpSecurityConfig -> SecurityBeansInjector: Inject Beans
+activate SecurityBeansInjector
+SecurityBeansInjector --> HttpSecurityConfig: Beans Configured
+deactivate SecurityBeansInjector
+HttpSecurityConfig --> Client: Security Configured
+deactivate HttpSecurityConfig
+@enduml

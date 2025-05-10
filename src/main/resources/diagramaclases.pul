@@ -1,0 +1,181 @@
+@startuml
+class UserController {
+  +createUser(UserDTO saveUser): ResponseEntity<Object>
+  +updateUser(UserDTO saveUser, UUID userUuid): ResponseEntity<Object>
+  +disabledUser(UUID userUuid): ResponseEntity<UserError>
+}
+
+interface UserService {
+  +registerUser(UserDTO saveUser): RegisteredUser
+  +updateUser(UserDTO saveUser, UUID userUuid): RegisteredUser
+  +disableUser(UUID userUuid): User
+}
+
+class UserServiceImpl {
+  +registerUser(UserDTO saveUser): RegisteredUser
+  +updateUser(UserDTO saveUser, UUID userUuid): RegisteredUser
+  +disableUser(UUID userUuid): User
+}
+
+class UserDTO
+class RegisteredUser
+class UserError
+class User
+
+UserController --> UserService
+
+UserService --> User
+UserController --> UserDTO
+UserController --> RegisteredUser
+UserController --> UserError
+
+class UserServiceImpl [[java:com.crud.challenger.service.impl.UserServiceImpl]] {
+	-{static} log: org.slf4j.Logger
+	-{static} PASSWORD_REGEX_MSG: String
+	-{static} PASSWORDS_NOT_MATCH_MSG: String
+	-{static} USER_NOTE_FOUND_MSG: String
+	-passwordPattern: String
+	-passwordEncoder: PasswordEncoder
+	-userRepository: UserRepository
+	-jwtService: JwtService
+	+UserServiceImpl(userRepository: UserRepository, passwordEncoder: PasswordEncoder, jwtService: JwtService)
+	+registerUser(saveUser: UserDTO): RegisteredUser
+	+updateUser(saveUser: UserDTO, userUuid: UUID): RegisteredUser
+	+disableUser(userUuid: UUID): User
+	-extractAllClaims(user: User): Map<String,Object>
+	-saveUserTOuser(saveUser: UserDTO, user: User): User
+	-validatePassword(user: UserDTO): void
+	-saveUserTORegisteredUser(user: User): RegisteredUser
+	-validateEmail(email: String): void
+}
+interface UserService {
+}
+UserService <|.. UserServiceImpl
+
+class JwtService [[java:com.crud.challenger.service.auth.JwtService]] {
+	-EXPIRATION_IN_MINUTES: Long
+	-SECRET_KEY: String
+	+generateToken(userName: String, extraClaims: Map<String,Object>): String
+	-generatedKey(): SecretKey
+	+extractAllClaims(jwt: String): Claims
+}
+
+interface UserRepository [[java:com.crud.challenger.persistence.repositories.UserRepository]] {
+	findByUserName(name: String): Optional<User>
+	findByEmail(email: String): Optional<User>
+}
+interface "JpaRepository<User,UUID>" as JpaRepository_User_UUID_ {
+}
+JpaRepository_User_UUID_ <|-- UserRepository
+
+class HttpSecurityConfig [[java:com.crud.challenger.config.security.HttpSecurityConfig]] {
+	-authenticationProvider: AuthenticationProvider
+	~securityFilterChain(http: HttpSecurity): SecurityFilterChain
+}   
+
+class SecurityBeansInjector [[java:com.crud.challenger.config.security.SecurityBeansInjector]] {
+	-userRepository: UserRepository
+	+SecurityBeansInjector(userRepository: UserRepository)
+	~authenticationManager(authenticationConfiguration: AuthenticationConfiguration): AuthenticationManager
+	~passwordEncoder(): PasswordEncoder
+	~userDetailsService(): UserDetailsService
+	~authenticationProvider(): AuthenticationProvider
+}
+class User [[java:com.crud.challenger.persistence.entities.User]] {
+	-{static} serialVersionUID: long
+	-userUuid: UUID
+	-name: String
+	-userName: String
+	-email: String
+	-password: String
+	-jwtToken: String
+	-createdAt: Date
+	-updatedAt: Date
+	-lastLogin: Date
+	-active: UserStatus
+	+isActive(): Boolean
+	+getAuthorities(): Collection<? extends GrantedAuthority>
+	+getUsername(): String
+	+getUserUuid(): UUID
+	+getName(): String
+	+getEmail(): String
+	+getPassword(): String
+	+getJwtToken(): String
+	+getCreatedAt(): Date
+	+getUpdatedAt(): Date
+	+getLastLogin(): Date
+	+getActive(): UserStatus
+	+setUserUuid(userUuid: UUID): void
+	+setName(name: String): void
+	+setUserName(userName: String): void
+	+setEmail(email: String): void
+	+setPassword(password: String): void
+	+setPhones(phones: Phone[]): void
+	+setJwtToken(jwtToken: String): void
+	+setCreatedAt(createdAt: Date): void
+	+setUpdatedAt(updatedAt: Date): void
+	+setLastLogin(lastLogin: Date): void
+	+setActive(active: UserStatus): void
+	+equals(o: Object): boolean
+	#canEqual(other: Object): boolean
+	+hashCode(): int
+	+toString(): String
+	+User()
+}
+class Phone [[java:com.crud.challenger.persistence.entities.Phone]] {
+	-phoneUuid: UUID
+	-number: String
+	-cityCode: String
+	-countryCode: String
+	-user: User
+	+getPhoneUuid(): UUID
+	+getNumber(): String
+	+getCityCode(): String
+	+getCountryCode(): String
+	+getUser(): User
+	+setPhoneUuid(phoneUuid: UUID): void
+	+setNumber(number: String): void
+	+setCityCode(cityCode: String): void
+	+setCountryCode(countryCode: String): void
+	+setUser(user: User): void
+	+toString(): String
+	+Phone()
+	+equals(o: Object): boolean
+	#canEqual(other: Object): boolean
+	+hashCode(): int
+}
+User --> "*" Phone : phones
+class Phone {
+}
+User --> "*" Phone : getPhones()
+interface UserDetails {
+}
+UserDetails <|.. User
+class Phone [[java:com.crud.challenger.persistence.entities.Phone]] {
+	-phoneUuid: UUID
+	-number: String
+	-cityCode: String
+	-countryCode: String
+	+getPhoneUuid(): UUID
+	+getNumber(): String
+	+getCityCode(): String
+	+getCountryCode(): String
+	+setPhoneUuid(phoneUuid: UUID): void
+	+setNumber(number: String): void
+	+setCityCode(cityCode: String): void
+	+setCountryCode(countryCode: String): void
+	+setUser(user: User): void
+	+toString(): String
+	+Phone()
+	+equals(o: Object): boolean
+	#canEqual(other: Object): boolean
+	+hashCode(): int
+}
+class User {
+}
+Phone --> "1" User : user
+class User {
+}
+Phone --> "1" User : getUser()
+
+@enduml
